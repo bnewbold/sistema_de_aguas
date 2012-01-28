@@ -1,0 +1,36 @@
+
+Sistema de Aguas
+------------------
+Mexican Sewer Diver Julio Cou Cámara is a hero!
+
+http://www.ediblegeography.com/julio-the-sewer-diver/
+
+http://www.washingtonpost.com/wp-dyn/articles/A45322-2004Aug29.html
+
+http://video.nationalgeographic.com/video/player/places/regions-places/us-canada-and-mexico/mexico_sewerdiving.html
+
+
+Toolchain Setup
+-----------------
+
+Download the Maple IDE and Gameduino libraries ("maple variant"):
+
+http://leaflabs.com/docs/maple-ide-install.html
+http://excamera.com/files/Gameduino_m.zip
+
+Install the Maple IDE following the instructions, then copy the Gameduino
+directory (from Gameduino_m.zip) to the IDE's /libraries/ path. Install the
+udev files on linux platforms. 
+
+In the IDE directory, create symlink (or copy file)
+'hardware/leaflabs/cores/maple/spi.h' to `SPI.h` so that example Gameduino
+libraries will "just work". Select the appropriate board and serial port from
+the "Tools" menu, then try compiling and uploading one of the Gameduino example
+sketches.
+
+Reference Links
+----------------
+- http://excamera.com/sphinx/gameduino/
+- http://www.artlum.com/gameduino/gameduino.html
+- http://leaflabs.com/docs/language.html
+- http://leaflabs.com/docs/lang/api/hardwarespi.html
