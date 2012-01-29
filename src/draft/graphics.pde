@@ -14,30 +14,31 @@ static void clear_all_sprites() {
 }
 
 static void init_splashpage() {
-  for (byte y = 0; y < 64; y++)
-    GD.copy(RAM_PIC + y * 64, allsewage_pic + y * 64, 64);
-  GD.copy(RAM_CHR, allsewage_chr, sizeof(allsewage_chr));
-  GD.copy(RAM_PAL, allsewage_pal, sizeof(allsewage_pal));
-  
+  for (byte y = 0; y < 37; y++)
+    GD.copy(RAM_PIC + y * 64, splash_pic + y * 49, 49);
+  GD.copy(RAM_CHR, splash_chr, sizeof(splash_chr));
+  GD.copy(RAM_PAL, splash_pal, sizeof(splash_pal));
+  /*
   GD.__wstartspr(0);
   for (int rand_count = 0; rand_count < 20; rand_count += 1) {
     draw_standing_all(random(400),random(300));
   }
   GD.__end();
+  */
   
 }
 
 static void init_background() {
   for (byte y = 0; y < 64; y++)
-    GD.copy(RAM_PIC + y * 64, allsewage_pic + y * 64, 64);
-  GD.copy(RAM_CHR, allsewage_chr, sizeof(allsewage_chr));
-  GD.copy(RAM_PAL, allsewage_pal, sizeof(allsewage_pal));
+    GD.copy(RAM_PIC + y * 64, background_pic + y * 64, 64);
+  GD.copy(RAM_CHR, background_chr, sizeof(background_chr));
+  GD.copy(RAM_PAL, background_pal, sizeof(background_pal));
 }
 
 // ================  TRASH MANAGEMENT ===================
 
 #define DEAD_TRASH_SPRID  54
-#define NUM_TRASH         20
+#define NUM_TRASH         32
 #define STUCKX            100
 
 struct trash_item {
@@ -87,7 +88,7 @@ static void add_trash() {
   for (i = 0; i < NUM_TRASH; i++) {
     if(trash_bag[i].sprid == 0xFF) {
       trash_bag[i].x = 400;
-      trash_bag[i].y = 25 + random(200);
+      trash_bag[i].y = 90 + random(200);
       trash_bag[i].vx = 3 + random(5);
       trash_bag[i].sprid = 36;
       trash_bag[i].collid = 255;

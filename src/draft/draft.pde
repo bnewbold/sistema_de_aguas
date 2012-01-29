@@ -1,15 +1,17 @@
 #include <SPI.h>
 #include <GD.h>
 
-#include "allsewage.h" // http://gameduino.com/results/b2f4c588/
-#include "sprites.h"   // http://gameduino.com/results/16fe50de/
+#include "background.h" // http://gameduino.com/results/3514e886/
+#include "splash.h"     // http://gameduino.com/results/fe36d9fd/
+#include "allsewage.h"  // http://gameduino.com/results/b2f4c588/
+#include "sprites.h"    // http://gameduino.com/results/16fe50de/
 
 #define SWIM_SPEED    1
 
 #define WEAPON_GROUP  0
 #define TARGET_GROUP  1
 
-#define NUM_TRASH         20
+#define NUM_TRASH         32  // ugh, redefined
 
 #define KEY_UP(x)      ((x >> 7) & 0x01)
 #define KEY_DOWN(x)    ((x >> 6) & 0x01)
@@ -89,6 +91,9 @@ void setup()
   narcoy = 150;
   narcovy = -1;
   trash_rate = 100;
+  scrollx = 0;
+  scrolly = 3;
+  t = 0;
   
   delay(250);
   GD.begin();
@@ -125,10 +130,11 @@ void loop()
   
   // scroll background
   GD.wr16(SCROLL_X, scrollx);
+  GD.wr16(SCROLL_Y, scrolly);
   GD.__wstartspr(0);
   //draw_standing_all(10,270);
   draw_all_trash();
-  if (t > 72 * 30) {
+  if (t > (72 * 30)) {
     draw_narco(narcox, narcoy, narco_sunk);
     if (narco_sunk) {
       for (uint8 i = 0; i < 5; i++) {
