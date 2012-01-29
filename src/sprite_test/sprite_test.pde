@@ -6,11 +6,22 @@
 
 #define JAWS_OPEN     0
 #define JAWS_CLOSED   1
-#define SWIM_SPEED    4
-#define FLOW_SPEED
+#define SWIM_SPEED    1
+#define FLOW_SPEED    2
+
+#define KEY_UP(x)      ((x >> 7) & 0x01)
+#define KEY_DOWN(x)    ((x >> 6) & 0x01)
+#define KEY_LEFT(x)    ((x >> 5) & 0x01)
+#define KEY_RIGHT(x)   ((x >> 4) & 0x01)
+#define KEY_C(x)       ((x >> 3) & 0x01)
+#define KEY_V(x)       ((x >> 2) & 0x01)
+#define KEY_SPACE(x)   ((x >> 1) & 0x01)
+#define KEY_ESCAPE(x)  ((x >> 0) & 0x01)
+static boolean last_space = false;
 
 static unsigned int t = 0;
 static uint16 swimx, swimy;
+static int8 swimvx, swimvy;
 static uint16 narcox, narcoy;
 static int8 narcovx, narcovy;
 static uint8 swim_jaws;
@@ -103,6 +114,74 @@ static void draw_swim(int x, int y, boolean is_open) {
   }
 }
 
+void static old_process_keypress() {
+  if(SerialUSB.available()) {
+    inchar = SerialUSB.read();
+    while(SerialUSB.available()) {
+      inchar = SerialUSB.read();
+    }
+    SerialUSB.println(inchar, 16);
+    switch(inchar) {
+      case 'w':
+        swimy -= SWIM_SPEED;
+        break;
+      case 's':
+        swimy += SWIM_SPEED;
+        break;
+      case 'a':
+        swimx -= SWIM_SPEED;
+        break;
+      case 'd':
+        swimx += SWIM_SPEED;
+        break;
+      case 'W':
+        swimy -= SWIM_SPEED;
+        swim_jaws = 20;
+        break;
+      case 'S':
+        swimy += SWIM_SPEED;
+        swim_jaws = 20;
+        break;
+      case 'A':
+        swimx -= SWIM_SPEED;
+        swim_jaws = 20;
+        break;
+      case 'D':
+        swimx += SWIM_SPEED;
+        swim_jaws = 20;
+        break;
+      case ' ':
+        swim_jaws = 20;
+        break;
+      default:
+        break;
+    }
+  }
+}
+
+void static process_keypress() {
+  if(SerialUSB.available()) {
+    inchar = SerialUSB.read();
+    while(SerialUSB.available()) {
+      inchar = SerialUSB.read();
+    }
+    SerialUSB.println(inchar, 2);
+    swimvx = 0;
+    swimvy = 0;
+    if (KEY_LEFT(inchar)) { swimvx -= SWIM_SPEED; }
+    if (KEY_RIGHT(inchar)) { swimvx += SWIM_SPEED; }
+    if (KEY_UP(inchar)) { swimvy -= SWIM_SPEED; }
+    if (KEY_DOWN(inchar)) { swimvy += SWIM_SPEED; }
+    if (KEY_SPACE(inchar) and !last_space) { swim_jaws = 20; }
+    if (!KEY_SPACE(inchar)) { swim_jaws = 0; }
+    last_space = KEY_SPACE(inchar);
+    if (KEY_ESCAPE(inchar)) {
+      sunk_ship = false;
+      narcoy = 150;
+    }
+  }
+}
+
 void setup()
 {
   pinMode(BOARD_BUTTON_PIN, INPUT);
@@ -161,49 +240,9 @@ void loop()
     swim_jaws -= 1;
   }
   
-  if(SerialUSB.available()) {
-    inchar = SerialUSB.read();
-    while(SerialUSB.available()) {
-      inchar = SerialUSB.read();
-    }
-    SerialUSB.println(inchar, 16);
-    switch(inchar) {
-      case 'w':
-        swimy -= SWIM_SPEED;
-        break;
-      case 's':
-        swimy += SWIM_SPEED;
-        break;
-      case 'a':
-        swimx -= SWIM_SPEED;
-        break;
-      case 'd':
-        swimx += SWIM_SPEED;
-        break;
-      case 'W':
-        swimy -= SWIM_SPEED;
-        swim_jaws = 20;
-        break;
-      case 'S':
-        swimy += SWIM_SPEED;
-        swim_jaws = 20;
-        break;
-      case 'A':
-        swimx -= SWIM_SPEED;
-        swim_jaws = 20;
-        break;
-      case 'D':
-        swimx += SWIM_SPEED;
-        swim_jaws = 20;
-        break;
-      case ' ':
-        swim_jaws = 20;
-        break;
-      default:
-        break;
-    }
-  }
+  process_keypress();
 
+/*
   if(touching_swimmer != 255) {
     SerialUSB.print("Enemy: ");
     SerialUSB.println(enemy_id, 10);
@@ -221,12 +260,12 @@ void loop()
     SerialUSB.print("Touching enemy: ");
     SerialUSB.println(touching_enemy, 10);
   }
-  
+*/  
   if (swim_jaws > 15 and (touching_swimmer == enemy_id || touching_enemy == swimmer_id)) {
     sunk_ship = true;
   }
-  swimx = (swimx % 400);
-  swimy = (swimy % 300);
+  swimx = ((swimx + swimvx) % 400);
+  swimy = ((swimy + swimvy) % 300);
 
   if(!sunk_ship) {
     if(narcoy > 170) { narcovy = -1; }
